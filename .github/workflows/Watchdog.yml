@@ -92,10 +92,10 @@ jobs:
       - name: Close Issues if queue is healthy
         if: env.stale_found == 'false'
         run: |
-          # Find all open watchdog issues for blank.yml
+          # Find all open watchdog issues for stage.yml
           issues=$(gh issue list \
             --repo ${{ github.repository }} \
-            --search "Queued job stuck (blank.yml) in:title state:open" \
+            --search "Queued job stuck (stage.yml) in:title state:open" \
             --json number,title --jq '.[] | .number')
           if [ -z "$issues" ]; then
             echo "No open watchdog issues found."

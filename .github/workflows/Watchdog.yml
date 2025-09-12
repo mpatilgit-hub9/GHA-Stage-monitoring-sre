@@ -1,4 +1,4 @@
-name: Watchdog - Monitor gha-prod-workflow Status
+name: Watchdog - Monitor gha-stage-workflow Status
 
 on:
   schedule:

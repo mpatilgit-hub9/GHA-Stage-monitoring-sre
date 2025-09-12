@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  monitor-blank:
+  monitor-stage:
     runs-on: ubuntu-latest
     steps:
-      - name: Check queued runs of blank.yml
+      - name: Check queued runs of stage.yml
         id: check
         run: |
           echo "Checking queued runs for stage.yml..."
@@ -58,15 +58,15 @@ jobs:
             [ -z "$id" ] && continue
             run_url="https://github.com/${{ github.repository }}/actions/runs/$id"
             if [ "$severity" = "severe" ]; then
-              title="🚨🔥 Severe Red Alert: Queued job stuck > 60 minutes (blank.yml) - Run ID: $id"
+              title="🚨🔥 Severe Red Alert: Queued job stuck > 60 minutes (stage.yml) - Run ID: $id"
               body="Workflow **stage.yml** (Run Number: $num) has been queued since $created and is still stuck (>60 minutes).\n\n🔗 [View Run in GitHub Actions]($run_url)"
               label="watchdog,severe-red-alert"
             elif [ "$severity" = "red" ]; then
-              title="🚨🛑 Red Alert: Queued job stuck > 30 minutes (blank.yml) - Run ID: $id"
+              title="🚨🛑 Red Alert: Queued job stuck > 30 minutes (stage.yml) - Run ID: $id"
               body="Workflow **stage.yml** (Run Number: $num) has been queued since $created and is still stuck (>30 minutes).\n\n🔗 [View Run in GitHub Actions]($run_url)"
               label="watchdog,red-alert"
             else
-              title="⚠️🟡 Yellow Alert: Queued job stuck > 10 minutes (blank.yml) - Run ID: $id"
+              title="⚠️🟡 Yellow Alert: Queued job stuck > 10 minutes (stage.yml) - Run ID: $id"
               body="Workflow **stage.yml** (Run Number: $num) has been queued since $created and is still stuck (>10 minutes).\n\n🔗 [View Run in GitHub Actions]($run_url)"
               label="watchdog,yellow-alert"
             fi

@@ -1,20 +1,20 @@
-name: Watchdog - Monitor gha-stage-workflow Status
+name: Watchdog - Monitor gha-prod-workflow Status
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # every 5 minutes
+    - cron: "*/10 * * * *"   # every 10 minutes
   workflow_dispatch:
 
 jobs:
-  monitor-stage:
+  monitor-blank:
     runs-on: ubuntu-latest
     steps:
-      - name: Check queued runs of stage.yml
+      - name: Check queued runs of blank.yml
         id: check
         run: |
-          echo "Checking queued runs for stage.yml..."
-          # Get workflow runs for stage.yml with status=queued
-          runs=$(gh api repos/${{ github.repository }}/actions/workflows/stage.yml/runs \
+          echo "Checking queued runs for blank.yml..."
+          # Get workflow runs for blank.yml with status=queued
+          runs=$(gh api repos/${{ github.repository }}/actions/workflows/blank.yml/runs \
             --jq '.workflow_runs[] | select(.status=="queued") | {id: .id, run_number: .run_number, created_at: .created_at}' )
           echo "Found runs:"
           echo "$runs"
@@ -24,9 +24,9 @@ jobs:
             echo "No queued runs found."
             exit 0
           fi
-          cutoff_yellow=$(date -u -d "10 minutes ago" +%s)
-          cutoff_red=$(date -u -d "30 minutes ago" +%s)
-          cutoff_severe=$(date -u -d "60 minutes ago" +%s)
+          cutoff_yellow=$(date -u -d "30 minutes ago" +%s)
+          cutoff_red=$(date -u -d "60 minutes ago" +%s)
+          cutoff_severe=$(date -u -d "90 minutes ago" +%s)
           stale_runs=""
           while IFS= read -r run; do
             id=$(echo "$run" | jq -r '.id')
@@ -58,16 +58,16 @@ jobs:
             [ -z "$id" ] && continue
             run_url="https://github.com/${{ github.repository }}/actions/runs/$id"
             if [ "$severity" = "severe" ]; then
-              title="🚨🔥 Severe Red Alert: Queued job stuck > 60 minutes (stage.yml) - Run ID: $id"
-              body="Workflow **stage.yml** (Run Number: $num) has been queued since $created and is still stuck (>60 minutes).\n\n🔗 [View Run in GitHub Actions]($run_url)"
+              title="🚨🔥 Severe Red Alert: Queued job stuck > 90 minutes (blank.yml) - Run ID: $id"
+              body="Workflow **blank.yml** (Run Number: $num) has been queued since $created and is still stuck (>90 minutes).\n\n🔗 [View Run in GitHub Actions]($run_url)"
               label="watchdog,severe-red-alert"
             elif [ "$severity" = "red" ]; then
-              title="🚨🛑 Red Alert: Queued job stuck > 30 minutes (stage.yml) - Run ID: $id"
-              body="Workflow **stage.yml** (Run Number: $num) has been queued since $created and is still stuck (>30 minutes).\n\n🔗 [View Run in GitHub Actions]($run_url)"
+              title="🚨🛑 Red Alert: Queued job stuck > 60 minutes (blank.yml) - Run ID: $id"
+              body="Workflow **blank.yml** (Run Number: $num) has been queued since $created and is still stuck (>60 minutes).\n\n🔗 [View Run in GitHub Actions]($run_url)"
               label="watchdog,red-alert"
             else
-              title="⚠️🟡 Yellow Alert: Queued job stuck > 10 minutes (stage.yml) - Run ID: $id"
-              body="Workflow **stage.yml** (Run Number: $num) has been queued since $created and is still stuck (>10 minutes).\n\n🔗 [View Run in GitHub Actions]($run_url)"
+              title="⚠️🟡 Yellow Alert: Queued job stuck > 30 minutes (blank.yml) - Run ID: $id"
+              body="Workflow **blank.yml** (Run Number: $num) has been queued since $created and is still stuck (>30 minutes).\n\n🔗 [View Run in GitHub Actions]($run_url)"
               label="watchdog,yellow-alert"
             fi
             # Check if issue already exists for this Run ID + severity
@@ -92,10 +92,10 @@ jobs:
       - name: Close Issues if queue is healthy
         if: env.stale_found == 'false'
         run: |
-          # Find all open watchdog issues for stage.yml
+          # Find all open watchdog issues for blank.yml
           issues=$(gh issue list \
             --repo ${{ github.repository }} \
-            --search "Queued job stuck (stage.yml) in:title state:open" \
+            --search "Queued job stuck (blank.yml) in:title state:open" \
             --json number,title --jq '.[] | .number')
           if [ -z "$issues" ]; then
             echo "No open watchdog issues found."

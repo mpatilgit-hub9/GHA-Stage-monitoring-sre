@@ -22,11 +22,13 @@ steps:
 
   - name: Check queued runs of blank.yml
     id: check
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     run: |
       echo "Checking queued runs for blank.yml..."
 
       runs=$(gh api repos/${{ github.repository }}/actions/workflows/blank.yml/runs \
-        --jq '.workflow_runs[] | select(.status=="queued") | {id: .id, run_number: .run_number, created_at: .created_at}' )
+        --jq '.workflow_runs[] | select(.status=="queued") | {id: .id, run_number: .run_number, created_at: .created_at}')
 
       echo "stale_found=false" >> $GITHUB_ENV
 
@@ -65,8 +67,6 @@ steps:
         echo "$stale_runs" > stale_runs.txt
         echo "stale_found=true" >> $GITHUB_ENV
       fi
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   - name: Send Slack Alert if stale jobs found
     if: env.stale_found == 'true'

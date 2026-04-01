@@ -13,7 +13,6 @@ jobs:
 monitor-blank:
 runs-on: ubuntu-latest
 
-```
 steps:
   - name: Install dependencies
     run: |
@@ -89,4 +88,3 @@ steps:
           ${{ secrets.SLACK_WEBHOOK_URL }}
 
       done < stale_runs.txt
-```

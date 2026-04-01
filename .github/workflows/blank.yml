@@ -16,10 +16,14 @@ matrix:
 runner: ["ubuntu-24.04-ppc64le", "ubuntu-24.04-ppc64le-p10"]
 fail-fast: false
 runs-on: ${{ matrix.runner }}
+
+```
 steps:
-- uses: actions/checkout@v4
-- name: Run a one-line script
-run: echo "Hello, world! GitHub app is running successfully on ${{ matrix.runner }}"
+  - uses: actions/checkout@v4
+
+  - name: Run a one-line script
+    run: echo "Hello, world! GitHub app is running successfully on ${{ matrix.runner }}"
+```
 
 code-quality:
 name: Code quality
@@ -28,14 +32,19 @@ matrix:
 runner: ["ubuntu-24.04-ppc64le", "ubuntu-24.04-ppc64le-p10"]
 fail-fast: false
 runs-on: ${{ matrix.runner }}
+
+```
 steps:
-- uses: actions/checkout@v4
-- name: Run linting
-run: |
-if [ -x run_linting.sh ]; then
-bash run_linting.sh
-else
-echo "Skipping linting: run_linting.sh not found or not executable"
+  - uses: actions/checkout@v4
+
+  - name: Run linting
+    run: |
+      if [ -x run_linting.sh ]; then
+        bash run_linting.sh
+      else
+        echo "Skipping linting: run_linting.sh not found or not executable"
+      fi
+```
 
 notify:
 name: Notify failure in Slack

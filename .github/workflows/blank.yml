@@ -48,6 +48,10 @@ jobs:
     if: failure() && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: jayqi/failed-build-issue-action@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Send Slack Alert
+        run: |
+          msg="❌ CI Failed\nRepo: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nRun: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"$msg\"}" \
+            ${{ secrets.SLACK_WEBHOOK_URL }}

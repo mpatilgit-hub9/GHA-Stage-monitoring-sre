@@ -70,21 +70,27 @@ jobs:
       - name: Send Slack Alert if stale jobs found
         if: env.stale_found == 'true'
         run: |
-          while IFS=, read -r id num created severity; do
+          WEBHOOK="${{ secrets.SLACK_WEBHOOK_URL }}"
+          
+          while IFS=',' read -r id num created severity; do
             [ -z "$id" ] && continue
 
             run_url="https://github.com/${{ github.repository }}/actions/runs/$id"
 
             if [ "$severity" = "severe" ]; then
-              msg="🚨🔥 Severe Alert: Job stuck >90 min\nRun: $num\nCreated: $created\n$run_url"
+              msg="🔥 Severe Alert: Job stuck >90 min\nRun: $num\nCreated: $created\n$run_url"
             elif [ "$severity" = "red" ]; then
               msg="🚨 Red Alert: Job stuck >60 min\nRun: $num\nCreated: $created\n$run_url"
             else
               msg="⚠️ Yellow Alert: Job stuck >30 min\nRun: $num\nCreated: $created\n$run_url"
             fi
 
+            payload=$(jq -n --arg text "$msg" '{text: $text}')
+            
             curl -X POST -H 'Content-type: application/json' \
-              --data "{\"text\":\"$msg\"}" \
-              ${{ secrets.SLACK_WEBHOOK_URL }}
+              --data "$payload" \
+              "$WEBHOOK"
+
+            sleep 1
 
           done < stale_runs.txt

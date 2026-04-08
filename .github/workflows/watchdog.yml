@@ -2,7 +2,7 @@ name: Watchdog - Monitor gha-prod-workflow Status
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -18,12 +18,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y gh jq
-
-      - name: Test Slack webhook
-        run: |
-          curl -X POST -H "Content-type: application/json" \
-            --data '{"text":"🚀 Test message from GitHub Actions"}' \
-            "${{ secrets.SLACK_WEBHOOK_URL }}"
 
       - name: Check queued runs of blank.yml
         id: check
@@ -84,11 +78,11 @@ jobs:
             run_url="https://github.com/${{ github.repository }}/actions/runs/$id"
 
             if [ "$severity" = "severe" ]; then
-              msg="🔥 Severe Alert: Job stuck >90 min\nRun: $num\nCreated: $created\n$run_url"
+              msg="*🔥 Severe Alert: Job stuck >90 min*\nRun: $num\nCreated: $created\n$run_url"
             elif [ "$severity" = "red" ]; then
-              msg="🚨 Red Alert: Job stuck >60 min\nRun: $num\nCreated: $created\n$run_url"
+              msg="*🚨 Red Alert: Job stuck >60 min*\nRun: $num\nCreated: $created\n$run_url"
             else
-              msg="⚠️ Yellow Alert: Job stuck >30 min\nRun: $num\nCreated: $created\n$run_url"
+              msg="*⚠️ Yellow Alert: Job stuck >30 min*\nRun: $num\nCreated: $created\n$run_url"
             fi
 
             payload=$(jq -n --arg text "$msg" '{text: $text}')

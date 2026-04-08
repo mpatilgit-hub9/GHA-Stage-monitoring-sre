@@ -19,6 +19,12 @@ jobs:
           sudo apt update
           sudo apt install -y gh jq
 
+      - name: Test Slack webhook
+        run: |
+          curl -X POST -H "Content-type: application/json" \
+            --data '{"text":"🚀 Test message from GitHub Actions"}' \
+            "${{ secrets.SLACK_WEBHOOK_URL }}"
+
       - name: Check queued runs of blank.yml
         id: check
         env:

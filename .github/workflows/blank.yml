@@ -13,7 +13,7 @@ jobs:
   build:
     strategy:
       matrix:
-        runner: ["ubuntu-24.04-ppc64le", "ubuntu-24.04-ppc64le-p10"]
+        runner: ["ubuntu-24.04-ppc64le"]
       fail-fast: false
     runs-on: ${{ matrix.runner }}
     steps:
@@ -25,7 +25,7 @@ jobs:
     name: Code quality
     strategy:
       matrix:
-        runner: ["ubuntu-24.04-ppc64le", "ubuntu-24.04-ppc64le-p10"]
+        runner: ["ubuntu-24.04-ppc64le"]
       fail-fast: false
     runs-on: ${{ matrix.runner }}
     steps:
